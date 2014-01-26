@@ -6,7 +6,7 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is a derivative work of OpenFOAM.
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -22,28 +22,28 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Typedef
-    Foam::forceCoeffsFunctionObject
+    Foam::forceDirCoeffsFunctionObject
 
 Description
-    FunctionObject wrapper around forceCoeffs to allow them to be created via
+    FunctionObject wrapper around forceDirCoeffs to allow them to be created via
     the functions entry within controlDict.
 
 SourceFiles
-    forceCoeffsFunctionObject.C
+    forceDirCoeffsFunctionObject.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef forceCoeffsFunctionObject_H
-#define forceCoeffsFunctionObject_H
+#ifndef forceDirCoeffsFunctionObject_H
+#define forceDirCoeffsFunctionObject_H
 
-#include "forceCoeffs.H"
+#include "forceDirCoeffs.H"
 #include "OutputFilterFunctionObject.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    typedef OutputFilterFunctionObject<forceCoeffs> forceCoeffsFunctionObject;
+    typedef OutputFilterFunctionObject<forceDirCoeffs> forceDirCoeffsFunctionObject;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

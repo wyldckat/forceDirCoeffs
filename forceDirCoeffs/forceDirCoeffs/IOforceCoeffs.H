@@ -6,7 +6,7 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is a derivative work of OpenFOAM.
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -21,22 +21,29 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Typedef
+    Foam::IOforces
+
+Description
+    Instance of the generic IOOutputFilter for forceDirCoeffs.
+
 \*---------------------------------------------------------------------------*/
 
-#include "forceCoeffsFunctionObject.H"
+#ifndef IOforceDirCoeffs_H
+#define IOforceDirCoeffs_H
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+#include "forceDirCoeffs.H"
+#include "IOOutputFilter.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    defineNamedTemplateTypeNameAndDebug(forceCoeffsFunctionObject, 0);
-
-    addToRunTimeSelectionTable
-    (
-        functionObject,
-        forceCoeffsFunctionObject,
-        dictionary
-    );
+    typedef IOOutputFilter<forceDirCoeffs> IOforceDirCoeffs;
 }
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

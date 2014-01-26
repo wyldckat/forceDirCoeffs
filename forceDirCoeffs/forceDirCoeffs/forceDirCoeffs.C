@@ -5,8 +5,11 @@
     \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
+<2014-01-26> <Bruno Santos>: Adapted the changes indicated here, for 2.2.x: 
+  http://www.cfd-online.com/Forums/openfoam/92884-adding-side-force-forcecoeffs-c.html
+-------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is a derivative work of OpenFOAM.
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -23,7 +26,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "forceCoeffs.H"
+#include "forceDirCoeffs.H"
 #include "dictionary.H"
 #include "Time.H"
 #include "Pstream.H"
@@ -33,13 +36,13 @@ License
 
 namespace Foam
 {
-defineTypeNameAndDebug(forceCoeffs, 0);
+defineTypeNameAndDebug(forceDirCoeffs, 0);
 }
 
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-void Foam::forceCoeffs::writeFileHeader(const label i)
+void Foam::forceDirCoeffs::writeFileHeader(const label i)
 {
     if (i == 0)
     {
@@ -53,7 +56,7 @@ void Foam::forceCoeffs::writeFileHeader(const label i)
             << "# lRef      : " << lRef_ << nl
             << "# Aref      : " << Aref_ << nl
             << "# CofR      : " << coordSys_.origin() << nl
-            << "# Time" << tab << "Cm" << tab << "Cd" << tab << "Cl" << tab
+            << "# Time" << tab << "Cm" << tab << "Cy" << tab << "Cd" << tab << "Cl" << tab
             << "Cl(f)" << tab << "Cl(r)";
     }
     else if (i == 1)
@@ -72,7 +75,7 @@ void Foam::forceCoeffs::writeFileHeader(const label i)
             const word jn('[' + Foam::name(j) + ']');
 
             file(i)
-                << tab << "Cm" << jn << tab << "Cd" << jn << tab << "Cl" << jn;
+                << tab << "Cm" << jn << tab << "Cy" << jn << tab << "Cd" << jn << tab << "Cl" << jn;
         }
     }
     else
@@ -88,7 +91,7 @@ void Foam::forceCoeffs::writeFileHeader(const label i)
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::forceCoeffs::forceCoeffs
+Foam::forceDirCoeffs::forceDirCoeffs
 (
     const word& name,
     const objectRegistry& obr,
@@ -99,6 +102,7 @@ Foam::forceCoeffs::forceCoeffs
     forces(name, obr, dict, loadFromFiles, false),
     liftDir_(vector::zero),
     dragDir_(vector::zero),
+    sfDir_(vector::zero),
     pitchAxis_(vector::zero),
     magUInf_(0.0),
     lRef_(0.0),
@@ -112,13 +116,13 @@ Foam::forceCoeffs::forceCoeffs
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::forceCoeffs::~forceCoeffs()
+Foam::forceDirCoeffs::~forceDirCoeffs()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::forceCoeffs::read(const dictionary& dict)
+void Foam::forceDirCoeffs::read(const dictionary& dict)
 {
     if (active_)
     {
@@ -127,6 +131,7 @@ void Foam::forceCoeffs::read(const dictionary& dict)
         // Directions for lift and drag forces, and pitch moment
         dict.lookup("liftDir") >> liftDir_;
         dict.lookup("dragDir") >> dragDir_;
+        dict.lookup("sfDir") >> sfDir_;
         dict.lookup("pitchAxis") >> pitchAxis_;
 
         // Free stream velocity magnitude
@@ -139,25 +144,25 @@ void Foam::forceCoeffs::read(const dictionary& dict)
 }
 
 
-void Foam::forceCoeffs::execute()
+void Foam::forceDirCoeffs::execute()
 {
     // Do nothing - only valid on write
 }
 
 
-void Foam::forceCoeffs::end()
+void Foam::forceDirCoeffs::end()
 {
     // Do nothing - only valid on write
 }
 
 
-void Foam::forceCoeffs::timeSet()
+void Foam::forceDirCoeffs::timeSet()
 {
     // Do nothing - only valid on write
 }
 
 
-void Foam::forceCoeffs::write()
+void Foam::forceDirCoeffs::write()
 {
     forces::calcForcesMoment();
 
@@ -175,32 +180,36 @@ void Foam::forceCoeffs::write()
         Field<vector> totForce(force_[0] + force_[1] + force_[2]);
         Field<vector> totMoment(moment_[0] + moment_[1] + moment_[2]);
 
-        List<Field<scalar> > coeffs(3);
+        List<Field<scalar> > coeffs(4);
         coeffs[0].setSize(nBin_);
         coeffs[1].setSize(nBin_);
         coeffs[2].setSize(nBin_);
+        coeffs[3].setSize(nBin_);
 
         // lift, drag and moment
         coeffs[0] = (totForce & liftDir_)/(Aref_*pDyn);
         coeffs[1] = (totForce & dragDir_)/(Aref_*pDyn);
-        coeffs[2] = (totMoment & pitchAxis_)/(Aref_*lRef_*pDyn);
+        coeffs[2] = (totForce & sfDir_)/(Aref_*lRef_*pDyn);
+        coeffs[3] = (totMoment & pitchAxis_)/(Aref_*lRef_*pDyn);
 
         scalar Cl = sum(coeffs[0]);
         scalar Cd = sum(coeffs[1]);
-        scalar Cm = sum(coeffs[2]);
+        scalar Cy = sum(coeffs[2]);
+        scalar Cm = sum(coeffs[3]);
 
         scalar Clf = Cl/2.0 + Cm;
         scalar Clr = Cl/2.0 - Cm;
 
         file(0)
             << obr_.time().value() << tab
-            << Cm << tab << Cd << tab << Cl << tab << Clf << tab << Clr
+            << Cm << tab << Cy << tab << Cd << tab << Cl << tab << Clf << tab << Clr
             << endl;
 
         if (log_)
         {
             Info<< type() << " " << name_ << " output:" << nl
                 << "    Cm    = " << Cm << nl
+                << "    Cy    = " << Cy << nl
                 << "    Cd    = " << Cd << nl
                 << "    Cl    = " << Cl << nl
                 << "    Cl(f) = " << Clf << nl
@@ -216,6 +225,7 @@ void Foam::forceCoeffs::write()
                     coeffs[0][i] += coeffs[0][i-1];
                     coeffs[1][i] += coeffs[1][i-1];
                     coeffs[2][i] += coeffs[2][i-1];
+                    coeffs[3][i] += coeffs[3][i-1];
                 }
             }
 
@@ -224,6 +234,7 @@ void Foam::forceCoeffs::write()
             forAll(coeffs[0], i)
             {
                 file(1)
+                    << tab << coeffs[3][i]
                     << tab << coeffs[2][i]
                     << tab << coeffs[1][i]
                     << tab << coeffs[0][i];
