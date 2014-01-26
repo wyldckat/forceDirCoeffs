@@ -5,8 +5,11 @@
     \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
+<2012-11-04> <Bruno Santos>: Adapted the changes indicated here: 
+  http://www.cfd-online.com/Forums/openfoam/92884-adding-side-force-forcecoeffs-c.html
+-------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is a derivative work of OpenFOAM.
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
