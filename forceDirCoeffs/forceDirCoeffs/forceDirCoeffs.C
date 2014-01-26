@@ -23,19 +23,19 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "forceCoeffs.H"
+#include "forceDirCoeffs.H"
 #include "dictionary.H"
 #include "Time.H"
 #include "Pstream.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(Foam::forceCoeffs, 0);
+defineTypeNameAndDebug(Foam::forceDirCoeffs, 0);
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::forceCoeffs::forceCoeffs
+Foam::forceDirCoeffs::forceDirCoeffs
 (
     const word& name,
     const objectRegistry& obr,
@@ -46,6 +46,7 @@ Foam::forceCoeffs::forceCoeffs
     forces(name, obr, dict, loadFromFiles),
     liftDir_(vector::zero),
     dragDir_(vector::zero),
+    sfDir_(vector::zero),
     pitchAxis_(vector::zero),
     magUInf_(0.0),
     lRef_(0.0),
@@ -57,13 +58,13 @@ Foam::forceCoeffs::forceCoeffs
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::forceCoeffs::~forceCoeffs()
+Foam::forceDirCoeffs::~forceDirCoeffs()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::forceCoeffs::read(const dictionary& dict)
+void Foam::forceDirCoeffs::read(const dictionary& dict)
 {
     if (active_)
     {
@@ -72,6 +73,7 @@ void Foam::forceCoeffs::read(const dictionary& dict)
         // Directions for lift and drag forces, and pitch moment
         dict.lookup("liftDir") >> liftDir_;
         dict.lookup("dragDir") >> dragDir_;
+        dict.lookup("sfDir") >> sfDir_;
         dict.lookup("pitchAxis") >> pitchAxis_;
 
         // Free stream velocity magnitude
@@ -84,29 +86,29 @@ void Foam::forceCoeffs::read(const dictionary& dict)
 }
 
 
-void Foam::forceCoeffs::writeFileHeader()
+void Foam::forceDirCoeffs::writeFileHeader()
 {
     if (forcesFilePtr_.valid())
     {
         forcesFilePtr_()
-            << "# Time" << tab << "Cd" << tab << "Cl" << tab << "Cm" << endl;
+            << "# Time" << tab << "Cd" << tab << "Cl" << tab << "Cy" << tab << "Cm" << endl;
     }
 }
 
 
-void Foam::forceCoeffs::execute()
+void Foam::forceDirCoeffs::execute()
 {
     // Do nothing - only valid on write
 }
 
 
-void Foam::forceCoeffs::end()
+void Foam::forceDirCoeffs::end()
 {
     // Do nothing - only valid on write
 }
 
 
-void Foam::forceCoeffs::write()
+void Foam::forceDirCoeffs::write()
 {
     if (active_)
     {
@@ -122,23 +124,26 @@ void Foam::forceCoeffs::write()
 
         scalar liftForce = totForce & liftDir_;
         scalar dragForce = totForce & dragDir_;
+        scalar sideForce = totForce & sfDir_;
         scalar pitchMoment = totMoment & pitchAxis_;
 
         scalar Cl = liftForce/(Aref_*pDyn);
         scalar Cd = dragForce/(Aref_*pDyn);
+        scalar Cy = sideForce/(Aref_*pDyn);
         scalar Cm = pitchMoment/(Aref_*lRef_*pDyn);
 
         if (Pstream::master())
         {
             forcesFilePtr_()
                 << obr_.time().value() << tab
-                << Cd << tab << Cl << tab << Cm << endl;
+                << Cd << tab << Cl << tab << Cy << tab << Cm << endl;
 
             if (log_)
             {
-                Info<< "forceCoeffs output:" << nl
+                Info<< "forceDirCoeffs output:" << nl
                     << "    Cd = " << Cd << nl
                     << "    Cl = " << Cl << nl
+                    << "    Cy = " << Cy << nl
                     << "    Cm = " << Cm << nl
                     << "    Cl(f) = " << Cl/2.0 - Cm << nl
                     << "    Cl(r) = " << Cl/2.0 + Cm << nl

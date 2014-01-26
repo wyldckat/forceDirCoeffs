@@ -22,24 +22,28 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Typedef
-    Foam::IOforces
+    Foam::forceDirCoeffsFunctionObject
 
 Description
-    Instance of the generic IOOutputFilter for forceCoeffs.
+    FunctionObject wrapper around forceDirCoeffs to allow them to be created via
+    the functions entry within controlDict.
+
+SourceFiles
+    forceDirCoeffsFunctionObject.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef IOforceCoeffs_H
-#define IOforceCoeffs_H
+#ifndef forceDirCoeffsFunctionObject_H
+#define forceDirCoeffsFunctionObject_H
 
-#include "forceCoeffs.H"
-#include "IOOutputFilter.H"
+#include "forceDirCoeffs.H"
+#include "OutputFilterFunctionObject.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-    typedef IOOutputFilter<forceCoeffs> IOforceCoeffs;
+    typedef OutputFilterFunctionObject<forceDirCoeffs> forceDirCoeffsFunctionObject;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

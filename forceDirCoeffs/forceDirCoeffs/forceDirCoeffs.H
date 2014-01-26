@@ -22,20 +22,20 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::forceCoeffs
+    Foam::forceDirCoeffs
 
 Description
     Derived from the forces function object, creates a specialisation to
     calculate lift and drag forces.
 
 SourceFiles
-    forceCoeffs.C
-    IOforceCoeffs.H
+    forceDirCoeffs.C
+    IOforceDirCoeffs.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef forceCoeffs_H
-#define forceCoeffs_H
+#ifndef forceDirCoeffs_H
+#define forceDirCoeffs_H
 
 #include "forces.H"
 
@@ -45,10 +45,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class forceCoeffs Declaration
+                        Class forceDirCoeffs Declaration
 \*---------------------------------------------------------------------------*/
 
-class forceCoeffs
+class forceDirCoeffs
 :
     public forces
 {
@@ -60,7 +60,10 @@ class forceCoeffs
             vector liftDir_;
 
             //- Drag
-            vector  dragDir_;
+            vector dragDir_;
+            
+            //- Side Force
+            vector sfDir_;
 
             //- Pitch
             vector pitchAxis_;
@@ -84,10 +87,10 @@ class forceCoeffs
     // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        forceCoeffs(const forceCoeffs&);
+        forceDirCoeffs(const forceDirCoeffs&);
 
         //- Disallow default bitwise assignment
-        void operator=(const forceCoeffs&);
+        void operator=(const forceDirCoeffs&);
 
 
 protected:
@@ -99,14 +102,14 @@ protected:
 public:
 
     //- Runtime type information
-    TypeName("forceCoeffs");
+    TypeName("forceDirCoeffs");
 
 
     // Constructors
 
         //- Construct for given objectRegistry and dictionary.
         //  Allow the possibility to load fields from files
-        forceCoeffs
+        forceDirCoeffs
         (
             const word& name,
             const objectRegistry&,
@@ -116,7 +119,7 @@ public:
 
 
     //- Destructor
-    virtual ~forceCoeffs();
+    virtual ~forceDirCoeffs();
 
 
     // Member Functions
