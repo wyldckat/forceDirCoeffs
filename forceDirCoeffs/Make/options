@@ -18,4 +18,5 @@ LIB_LIBS = \
     -lcompressibleLESModels \
     -lfiniteVolume \
     -lmeshTools \
+    -lforces \
     -lfileFormats

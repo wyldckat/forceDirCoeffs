@@ -28,29 +28,29 @@ This is bound to the same license as OpenFOAM, namely GNU Public License v3. Quo
 How to get+build forceDirCoeffs
 ===============================
 
-These instructions are for OpenFOAM 2.1.x:
+These instructions are for OpenFOAM 2.2.x:
 
 For getting and building from git:
 ```
 git clone git://github.com/wyldckat/forceDirCoeffs.git
 cd forceDirCoeffs
-git checkout of21x
+git checkout of22x
 wmake libso forceDirCoeffs
 ```
 
 For getting and building from zip:
 ```
-wget "https://github.com/wyldckat/forceDirCoeffs/archive/of21x.zip" -O forceDirCoeffs.zip
+wget "https://github.com/wyldckat/forceDirCoeffs/archive/of22x.zip" -O forceDirCoeffs.zip
 unzip forceDirCoeffs.zip
-cd forceDirCoeffs-of21x
+cd forceDirCoeffs-of22x
 wmake libso forceDirCoeffs
 ```
 
-There is port for OpenFOAM 2.2.x as well! Simply replace on the instructions above `of21x` for `of22x`.
+There is port for OpenFOAM 2.1.x as well! Simply replace on the instructions above `of22x` for `of21x`.
 
 
 How to use it
 =============
 
-Sorry, too much in a hurry right now. Ask about it on this thread: http://www.cfd-online.com/Forums/openfoam/92884-adding-side-force-forcecoeffs-c.html
+Ask more about it on this thread: http://www.cfd-online.com/Forums/openfoam/92884-adding-side-force-forcecoeffs-c.html
 
