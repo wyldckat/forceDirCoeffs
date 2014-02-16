@@ -52,5 +52,27 @@ There is port for OpenFOAM 2.1.x as well! Simply replace on the instructions abo
 How to use it
 =============
 
-Ask more about it on this thread: http://www.cfd-online.com/Forums/openfoam/92884-adding-side-force-forcecoeffs-c.html
+The idea is that you should add the following line to the "controlDict" file:
+```
+libs (libforceDirCoeffs.so);
+```
+
+In case you already have a line that starts with "libs", then add the library name to the list, for example:
+If you have this:
+```
+libs (
+    libforces.so
+);
+```
+
+It becomes this:
+```
+libs (
+    libforces.so
+    libforceDirCoeffs.so
+);
+```
+
+
+For more, ask about it on this thread: http://www.cfd-online.com/Forums/openfoam/92884-adding-side-force-forcecoeffs-c.html
 
