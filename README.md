@@ -3,6 +3,8 @@ forceDirCoeffs
 
 This repository provides a function object based on `forceCoeffs` from OpenFOAM(R), but with the added side forces. This is based on the instructions given [here](http://www.cfd-online.com/Forums/openfoam/92884-adding-side-force-forcecoeffs-c.html) by the forum member [drrbradford](http://www.cfd-online.com/Forums/members/drrbradford.html) at [CFD-Online](http://www.cfd-online.com).
 
+This [git repository](https://github.com/wyldckat/forceDirCoeffs) was brought to you by Bruno Santos (wyldckat@github working at [blueCAPE Lda](http://www.bluecape.com.pt)).
+
 
 Disclaimer and License
 ======================
